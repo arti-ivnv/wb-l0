@@ -1,0 +1,23 @@
+# commands/tasks for app (makefile replacement)
+# see https://taskfile.dev/installation/ and https://taskfile.dev/usage/ for more information
+version: "3"
+
+tasks:
+  # migrate:
+  #   desc: execute migration
+  #   cmds:
+  #     - go run ./cmd/migrator --pg-url=postgres://postgres:postgres@localhost:15432/l0?sslmode=disable --mg-path=./migrations
+  app:run:
+    desc: start app core without external processes
+    cmds:
+      - go run ./cmd/order-service
+  app:run-simulator:
+    desc: run outer service simmulator (producer)
+    cmds:
+      - go run ./cmd/kafka-producer
+  app:full-start:
+    desc: application full start
+    cmds:
+      - docker-compose -f ./docker-compose.yaml up --build --detach
+      # - task migrate
+      - task app:run

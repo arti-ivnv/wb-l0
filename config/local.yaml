@@ -1,0 +1,4 @@
+env: local # local, dev, prod
+
+postgres:
+  url: postgres://postgres:postgres@localhost:15432/tarot?sslmode=disable
