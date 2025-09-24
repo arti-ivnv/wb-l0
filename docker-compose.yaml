@@ -1,12 +1,23 @@
 version: '3.8'
 services:
+  postgres:
+    image: postgres:17.4
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: wb_pass
+      POSTGRES_USER: wb_admin
+      POSTGRES_DB: wb_db
+    ports:
+      - "15432:5432"
+      # volumes:
+      # - ./db:/var/lib/postgresql/data # remove for dev
   zookeeper:
-   image: confluentinc/cp-zookeeper:latest
-   environment:
-     ZOOKEEPER_CLIENT_PORT: 2181
-     ZOOKEEPER_TICK_TIME: 2000
-   ports:
-     - 22181:2181
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
   broker:
     image: apache/kafka:latest
     hostname: broker

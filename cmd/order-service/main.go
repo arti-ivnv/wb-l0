@@ -14,6 +14,7 @@ import (
 
 	// "ls-0/arti/order/internal/config"
 	"ls-0/arti/order/internal/config"
+	"ls-0/arti/order/internal/kafka"
 	"ls-0/arti/order/internal/lib/logger/handlers/slogdiscard"
 	"ls-0/arti/order/internal/lib/logger/handlers/slogpretty"
 	"ls-0/arti/order/internal/web/server"
@@ -31,7 +32,8 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background()) // init context
 	// storage := postgres.New(ctx, cfg) // setup storage implementation
 	// TODO: init kafka
-	// go consumer.setUpConsumer()
+	// go consumer.SetUpNewConsumer(ctx)
+	go kafka.SetUpNewConsumer(ctx, log)
 	defer cancel()
 
 	// TODO: init web-server

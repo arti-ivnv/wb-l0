@@ -3,10 +3,10 @@
 version: "3"
 
 tasks:
-  # migrate:
-  #   desc: execute migration
-  #   cmds:
-  #     - go run ./cmd/migrator --pg-url=postgres://postgres:postgres@localhost:15432/l0?sslmode=disable --mg-path=./migrations
+  migrate:
+    desc: execute migration
+    cmds:
+      - go run ./cmd/migrator --pg-url=postgres://wb_admin:wb_pass@localhost:15432/wb_db?sslmode=disable --mg-path=./migrations
   app:run:
     desc: start app core without external processes
     cmds:
