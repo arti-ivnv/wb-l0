@@ -1,6 +1,6 @@
 package storage
 
-type Message struct {
+type Order struct {
 	OrderUuid         string   `json:"order_uid"`
 	TrackNumber       string   `json:"track_number"`
 	Entry             string   `json:"entry"`

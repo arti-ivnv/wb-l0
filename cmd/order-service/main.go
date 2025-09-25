@@ -17,6 +17,8 @@ import (
 	"ls-0/arti/order/internal/kafka"
 	"ls-0/arti/order/internal/lib/logger/handlers/slogdiscard"
 	"ls-0/arti/order/internal/lib/logger/handlers/slogpretty"
+	"ls-0/arti/order/internal/storage/postgres"
+	"ls-0/arti/order/internal/storage/safer"
 	"ls-0/arti/order/internal/web/server"
 )
 
@@ -27,13 +29,25 @@ const (
 )
 
 func main() {
-	cfg := config.MustLoad()                                // load config from config file
-	log := setupLogger(cfg.Env)                             // setup logger by env
-	ctx, cancel := context.WithCancel(context.Background()) // init context
-	// storage := postgres.New(ctx, cfg) // setup storage implementation
-	// TODO: init kafka
-	// go consumer.SetUpNewConsumer(ctx)
-	go kafka.SetUpNewConsumer(ctx, log)
+
+	// load config from config file
+	cfg := config.MustLoad()
+
+	// set up logger by env
+	log := setupLogger(cfg.Env)
+
+	// init context
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// set up storage implementation
+	storage := postgres.New(ctx, cfg)
+
+	// create a map to hold cash data
+	msgMap := safer.NewSafeMap()
+
+	// setting up a kafka consumer
+	go kafka.SetUpNewConsumer(ctx, storage, msgMap, log)
+
 	defer cancel()
 
 	// TODO: init web-server

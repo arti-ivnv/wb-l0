@@ -2,3 +2,9 @@ env: local # local, dev, prod
 
 postgres:
   url: postgres://wb_admin:wb_pass@localhost:15432/wb_db?sslmode=disable
+  pool:
+    maxConns: 20
+    minConns: 2
+    minIdle: 2
+    maxConnLifetime: 30m
+    healthcheckPeriod: 1m

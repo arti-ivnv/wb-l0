@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -13,7 +14,16 @@ type Config struct {
 }
 
 type Pg struct {
-	Url string `yaml:"url" env-required:"true"`
+	Url  string `yaml:"url" env-required:"true"`
+	Pool `yaml:"pool" env-required:true`
+}
+
+type Pool struct {
+	MaxConns          int32         `yaml:"maxConns" env-required:"true"`
+	MinIdle           int32         `yaml:"minIdle" env-required:"true"`
+	MinConns          int32         `yaml:"minConns" env-required:"true"`
+	MaxConnLifetime   time.Duration `yaml:"maxConnLifetime" env-required:"true"`
+	HealthcheckPeriod time.Duration `yaml:"healthcheckPeriod" env-required:"true"`
 }
 
 func MustLoad() *Config {
@@ -23,7 +33,6 @@ func MustLoad() *Config {
 	}
 	return MustLoadByPath(configPathFromEnv)
 }
-
 
 // Loads the config structure from the file path
 func MustLoadByPath(pathToConfigFile string) *Config {
