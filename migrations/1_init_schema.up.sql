@@ -9,12 +9,12 @@ CREATE TABLE IF NOT EXISTS orders
     delivery_service    VARCHAR(255),
     shardkey            VARCHAR(255),
     sm_id               BIGINT      ,
-    date_created        TIMESTAMP   ,
+    date_created        VARCHAR(255),
     oof_shard           VARCHAR(255)
 );
 
 
-CREATE TABLE IF NOT EXISTS deliveries
+CREATE TABLE IF NOT EXISTS delivery
 (
     delivery_id         SERIAL                      PRIMARY KEY,
     order_uid           VARCHAR(255)    NOT NULL    UNIQUE,

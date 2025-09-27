@@ -19,5 +19,6 @@ tasks:
     desc: application full start
     cmds:
       - docker-compose -f ./docker-compose.yaml up --build --detach
-      # - task migrate
+      # - task app:run-simulator
+      - task migrate
       - task app:run

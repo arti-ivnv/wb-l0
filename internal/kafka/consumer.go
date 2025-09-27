@@ -28,11 +28,11 @@ func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sf
 			log.Info("[CONSUMER] Getting a new kafka msg")
 		}
 
-		// try to convert to order model
-
 		// Save date to db
+		storage.AddOrder(string(msg.Value), ctx)
 
 		// Save data to map
+		sfm.Put(string(msg.Value), log)
 
 		err = reader.CommitMessages(context.Background(), msg)
 		if err != nil {

@@ -1,6 +1,8 @@
 package safer
 
 import (
+	"encoding/json"
+	"log/slog"
 	"ls-0/arti/order/internal/storage"
 	"sync"
 )
@@ -15,11 +17,19 @@ func NewSafeMap() *SafeMap {
 	return &SafeMap{orders: make(map[string]storage.Order)}
 }
 
-func (sfm *SafeMap) Put(key string, order storage.Order) {
+func (sfm *SafeMap) Put(inOrder string, log *slog.Logger) {
 	sfm.mu.Lock() // wr lock
 	defer sfm.mu.Unlock()
 
-	sfm.orders[key] = order
+	var order storage.Order
+	jsonOrder := []byte(inOrder)
+
+	err := json.Unmarshal(jsonOrder, &order)
+	if err != nil {
+		log.Error("Error unmarshaling json data: ", err.Error())
+	}
+
+	sfm.orders[order.OrderUuid] = order
 }
 
 func (sfm *SafeMap) Get(key string) (storage.Order, bool) {

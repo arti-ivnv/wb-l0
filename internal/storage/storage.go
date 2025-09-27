@@ -1,5 +1,6 @@
 package storage
 
+// DTO
 type Order struct {
 	OrderUuid         string   `json:"order_uid"`
 	TrackNumber       string   `json:"track_number"`
@@ -53,3 +54,5 @@ type Item struct {
 	Brand       string `json:"brand"`
 	Status      int    `json:"status"`
 }
+
+// DB Model
