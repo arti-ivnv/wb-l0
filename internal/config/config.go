@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Env string `yaml:"env" env-required:"true"`
 	Pg  `yaml:"postgres" env-required:"true"`
+	Kf  `yaml:"kafka" env-required:"true"`
 }
 
 type Pg struct {
@@ -24,6 +25,12 @@ type Pool struct {
 	MinConns          int32         `yaml:"minConns" env-required:"true"`
 	MaxConnLifetime   time.Duration `yaml:"maxConnLifetime" env-required:"true"`
 	HealthcheckPeriod time.Duration `yaml:"healthcheckPeriod" env-required:"true"`
+}
+
+type Kf struct {
+	Url     string `yaml:"url" env-required:"true"`
+	Topic   string `yaml:"topic" env-required:"true"`
+	GroupID string `yaml:"group-id" env-required:"true"`
 }
 
 func MustLoad() *Config {

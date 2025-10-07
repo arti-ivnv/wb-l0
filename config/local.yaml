@@ -8,3 +8,7 @@ postgres:
     minIdle: 2
     maxConnLifetime: 30m
     healthcheckPeriod: 1m
+kafka:
+  url: 127.0.0.1:9092
+  topic: wildberries-topic
+  group-id: wb-group

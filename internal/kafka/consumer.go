@@ -3,18 +3,19 @@ package kafka
 import (
 	"context"
 	"log/slog"
+	"ls-0/arti/order/internal/config"
 	"ls-0/arti/order/internal/storage/postgres"
 	"ls-0/arti/order/internal/storage/safer"
 
 	"github.com/segmentio/kafka-go"
 )
 
-func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sfm *safer.SafeMap, log *slog.Logger) {
+func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sfm *safer.SafeMap, log *slog.Logger, cfg *config.Config) {
 
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{"127.0.0.1:9092"},
-		Topic:   "wildberries-topic",
-		GroupID: "wb-group",
+		Brokers: []string{cfg.Kf.Url},
+		Topic:   cfg.Kf.Topic,
+		GroupID: cfg.Kf.GroupID,
 	})
 
 	defer reader.Close()

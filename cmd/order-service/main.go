@@ -46,7 +46,7 @@ func main() {
 	msgMap := safer.NewSafeMap()
 
 	// setting up a kafka consumer
-	go kafka.SetUpNewConsumer(ctx, storage, msgMap, log)
+	go kafka.SetUpNewConsumer(ctx, storage, msgMap, log, cfg)
 
 	defer cancel()
 

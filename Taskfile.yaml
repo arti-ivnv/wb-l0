@@ -3,8 +3,12 @@
 version: "3"
 
 tasks:
+  app:run-docker-compose:
+    desc: execute docker-compose
+    cmds:
+      - docker-compose -f ./docker-compose.yaml up --build --detach
   migrate:
-    desc: execute migration
+    desc: execute migration service
     cmds:
       - go run ./cmd/migrator --pg-url=postgres://wb_admin:wb_pass@localhost:15432/wb_db?sslmode=disable --mg-path=./migrations
   app:run:
@@ -18,7 +22,5 @@ tasks:
   app:full-start:
     desc: application full start
     cmds:
-      - docker-compose -f ./docker-compose.yaml up --build --detach
-      # - task app:run-simulator
       - task migrate
       - task app:run
