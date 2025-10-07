@@ -91,7 +91,7 @@ func main() {
 
 	defer writer.Close()
 
-	for {
+	for range 3 {
 
 		log.Info("[Simulator] Seding a new message")
 
@@ -108,7 +108,7 @@ func main() {
 
 		log.Info("[Simulator] Message was sent!")
 
-		time.Sleep(1 * time.Minute)
+		time.Sleep(3 * time.Second)
 
 	}
 

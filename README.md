@@ -28,6 +28,7 @@ export CONFIG_PATH=config/local.yaml
 ```
 task app:run-docker-compose
 ```
+2) В kafka-ui создать топик
 2) Запускаем сервис симуляции в отдельном терминале
 ```
 task app:run-simulator   

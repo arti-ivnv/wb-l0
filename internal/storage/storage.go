@@ -54,5 +54,3 @@ type Item struct {
 	Brand       string `json:"brand"`
 	Status      int    `json:"status"`
 }
-
-// DB Model

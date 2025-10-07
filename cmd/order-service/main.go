@@ -51,7 +51,7 @@ func main() {
 	defer cancel()
 
 	// TODO: init web-server
-	server.MustStart(ctx, cfg, log) // start web-server
+	server.MustStart(ctx, cfg, log, msgMap) // start web-server
 
 	log.Info("Service stopped")
 

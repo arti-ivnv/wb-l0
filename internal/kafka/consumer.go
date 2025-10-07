@@ -29,11 +29,15 @@ func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sf
 			log.Info("[CONSUMER] Getting a new kafka msg")
 		}
 
+		// TODO: Transaction starts here
+
 		// Save date to db
 		storage.AddOrder(string(msg.Value), ctx)
 
 		// Save data to map
 		sfm.Put(string(msg.Value), log)
+
+		// TODO: End transaction after db and cach safe
 
 		err = reader.CommitMessages(context.Background(), msg)
 		if err != nil {
