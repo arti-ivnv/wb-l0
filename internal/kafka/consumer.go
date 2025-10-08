@@ -25,25 +25,24 @@ func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sf
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
 			log.Error("[CONSUMER] Error reading a kafka message. err: ", err.Error())
+			continue
 		} else {
 			log.Info("[CONSUMER] Getting a new kafka msg")
 		}
 
-		// TODO: Transaction starts here
+		// Save date to db and kinda validate message
+		err = storage.AddOrder(string(msg.Value), ctx)
 
-		// Save date to db
-		storage.AddOrder(string(msg.Value), ctx)
+		if err == nil {
+			// Save data to map
+			sfm.Put(string(msg.Value), log)
 
-		// Save data to map
-		sfm.Put(string(msg.Value), log)
-
-		// TODO: End transaction after db and cach safe
-
-		err = reader.CommitMessages(context.Background(), msg)
-		if err != nil {
-			log.Error("[CONSUMER] Error commiting a kafka message. err: ", err.Error())
-		} else {
-			log.Info("[CONSUMER] Kafka msg was commited")
+			err = reader.CommitMessages(context.Background(), msg)
+			if err != nil {
+				log.Error("[CONSUMER] Error commiting a kafka message. err: ", err.Error())
+			} else {
+				log.Info("[CONSUMER] Kafka msg was commited")
+			}
 		}
 
 	}

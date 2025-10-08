@@ -2,6 +2,7 @@ package safer
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"ls-0/arti/order/internal/storage"
 	"sync"
@@ -30,6 +31,21 @@ func (sfm *SafeMap) Put(inOrder string, log *slog.Logger) {
 	}
 
 	sfm.orders[order.OrderUuid] = order
+}
+
+func (sfm *SafeMap) Recover(order []storage.Order) error {
+	sfm.mu.Lock() // wr lock
+	defer sfm.mu.Unlock()
+
+	if order == nil {
+		fmt.Errorf("order slise is nil in recovery method")
+	}
+
+	for i := 0; i < len(order); i++ {
+		sfm.orders[order[i].OrderUuid] = order[i]
+	}
+
+	return nil
 }
 
 func (sfm *SafeMap) Get(key string) (storage.Order, bool) {

@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -44,6 +45,11 @@ func main() {
 
 	// create a map to hold cash data
 	msgMap := safer.NewSafeMap()
+
+	err := msgMap.Recover(storage.GetAll(ctx))
+	if err != nil {
+		fmt.Errorf("error recovering cache %w", err)
+	}
 
 	// setting up a kafka consumer
 	go kafka.SetUpNewConsumer(ctx, storage, msgMap, log, cfg)

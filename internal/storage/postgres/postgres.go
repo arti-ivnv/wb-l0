@@ -8,6 +8,8 @@ import (
 	"ls-0/arti/order/internal/storage"
 	"sync"
 
+	"github.com/jackc/pgx/v5"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -59,7 +61,7 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 	err = json.Unmarshal(jsonOrder, &orderToSave)
 	if err != nil {
 		fmt.Println("Error unmarshaling json data: ", err)
-		return fmt.Errorf("Error unmarshaling json data: %w", err)
+		return fmt.Errorf("error unmarshaling json data: %w", err)
 	}
 
 	_, err = conn.Exec(
@@ -141,10 +143,66 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 		)
 
 		if err != nil {
-			fmt.Errorf("failed to save item: ", err)
 			return fmt.Errorf("failed to save item: %w", err)
 		}
 	}
 
 	return nil
+}
+
+func (ps *PostgresStorage) GetAll(ctx context.Context) []storage.Order {
+
+	// No need in lock since it will be executed within a single thread
+
+	conn, err := ps.pool.Acquire(ctx)
+	if err != nil {
+		fmt.Println("failed to acquire connection: ", err)
+		return nil
+	}
+
+	defer conn.Release()
+
+	var ordersToSave []storage.Order
+
+	orderRows, _ := conn.Query(ctx, "SELECT * FROM orders")
+
+	for orderRows.Next() {
+		var ord storage.Order
+
+		if err := orderRows.Scan(
+			&ord.OrderUuid,
+			&ord.TrackNumber,
+			&ord.Entry,
+			&ord.Locale,
+			&ord.InternalSignature,
+			&ord.CustomerId,
+			&ord.DeliveryService,
+			&ord.Shardkey,
+			&ord.SmId,
+			&ord.DateCreated,
+			&ord.OofShard,
+		); err != nil {
+			return nil
+		}
+
+		deliveryRow, _ := conn.Query(ctx, "SELECT * FROM delivery WHERE order_uid = $1")
+		delivery, _ := pgx.CollectExactlyOneRow(deliveryRow, pgx.RowToStructByName[storage.Delivery])
+		ord.Delivery = delivery
+
+		paumentRow, _ := conn.Query(ctx, "SELECT * FROM payment WHERE order_uid = $1")
+		payment, _ := pgx.CollectExactlyOneRow(paumentRow, pgx.RowToStructByName[storage.Payment])
+		ord.Payment = payment
+
+		itemRows, _ := conn.Query(ctx, "SELECT * FROM items WHERE order_uid")
+		var orderItems []storage.Item
+		for itemRows.Next() {
+			item, _ := pgx.CollectExactlyOneRow(itemRows, pgx.RowToStructByName[storage.Item])
+			orderItems = append(orderItems, item)
+		}
+		ord.Items = append(ord.Items, orderItems...)
+
+		ordersToSave = append(ordersToSave, ord)
+	}
+
+	return ordersToSave
 }
