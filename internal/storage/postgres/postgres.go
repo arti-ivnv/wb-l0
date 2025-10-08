@@ -64,7 +64,17 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 		return fmt.Errorf("error unmarshaling json data: %w", err)
 	}
 
-	_, err = conn.Exec(
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback(ctx)
+		}
+	}()
+
+	_, err = tx.Exec(
 		ctx,
 		"INSERT INTO orders (order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 		orderToSave.OrderUuid,
@@ -85,7 +95,7 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 		return fmt.Errorf("failed to save order: %w", err)
 	}
 
-	_, err = conn.Exec(
+	_, err = tx.Exec(
 		ctx,
 		"INSERT INTO delivery (order_uid, name, phone, zip, city, address, region, email) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
 		orderToSave.OrderUuid,
@@ -103,7 +113,7 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 		return fmt.Errorf("failed to save delivery: %w", err)
 	}
 
-	_, err = conn.Exec(
+	_, err = tx.Exec(
 		ctx,
 		"INSERT INTO payment (order_uid, transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 		orderToSave.OrderUuid,
@@ -125,7 +135,7 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 	}
 
 	for _, item := range orderToSave.Items {
-		_, err = conn.Exec(
+		_, err = tx.Exec(
 			ctx,
 			"INSERT INTO items (order_uid, chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 			orderToSave.OrderUuid,
@@ -145,6 +155,11 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to save item: %w", err)
 		}
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil
