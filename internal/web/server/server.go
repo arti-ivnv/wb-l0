@@ -18,15 +18,16 @@ func MustStart(ctx context.Context, cfg *config.Config, log *slog.Logger, sfm *s
 	router := mux.NewRouter()
 
 	// Handler registry
-	home := handlers.NewHomeHandler()
+	// home := handlers.NewHomeHandler()
 	ordersHandler := handlers.NewOrderHandler(sfm)
 
-	// Route registry
-	router.Handle("/", home)
+	// Serve static files from the "public" directory
+	fs := http.FileServer(http.Dir("./front-end"))
+	router.Handle("/", fs)
 
 	router.HandleFunc("/order/{order_uid}", ordersHandler.GetOrder).Methods("GET")
 
-	log.Info("Server is running on port 8080")
+	log.Info("Server is running on port 8087")
 
 	// Set a port via configuration
 	err := http.ListenAndServe(":8087", router)

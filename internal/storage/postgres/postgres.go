@@ -167,8 +167,6 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 
 func (ps *PostgresStorage) GetAll(ctx context.Context) []storage.Order {
 
-	// No need in lock since it will be executed within a single thread
-
 	conn, err := ps.pool.Acquire(ctx)
 	if err != nil {
 		fmt.Println("failed to acquire connection: ", err)
@@ -199,25 +197,64 @@ func (ps *PostgresStorage) GetAll(ctx context.Context) []storage.Order {
 		); err != nil {
 			return nil
 		}
-
-		deliveryRow, _ := conn.Query(ctx, "SELECT * FROM delivery WHERE order_uid = $1")
-		delivery, _ := pgx.CollectExactlyOneRow(deliveryRow, pgx.RowToStructByName[storage.Delivery])
-		ord.Delivery = delivery
-
-		paumentRow, _ := conn.Query(ctx, "SELECT * FROM payment WHERE order_uid = $1")
-		payment, _ := pgx.CollectExactlyOneRow(paumentRow, pgx.RowToStructByName[storage.Payment])
-		ord.Payment = payment
-
-		itemRows, _ := conn.Query(ctx, "SELECT * FROM items WHERE order_uid")
-		var orderItems []storage.Item
-		for itemRows.Next() {
-			item, _ := pgx.CollectExactlyOneRow(itemRows, pgx.RowToStructByName[storage.Item])
-			orderItems = append(orderItems, item)
-		}
-		ord.Items = append(ord.Items, orderItems...)
-
 		ordersToSave = append(ordersToSave, ord)
 	}
+
+	orderRows.Close()
+
+	for i := range ordersToSave {
+		deliveryRow, _ := conn.Query(ctx, "SELECT name, phone, zip, city, address, region, email FROM delivery WHERE order_uid = $1", ordersToSave[i].OrderUuid)
+		delivery, err := pgx.CollectExactlyOneRow(deliveryRow, pgx.RowToStructByName[storage.Delivery])
+		if err != nil {
+			fmt.Println("delivery_rec_err: ", err)
+		}
+		fmt.Println(delivery)
+
+		ordersToSave[i].Delivery = delivery
+		deliveryRow.Close()
+
+		paymentRow, _ := conn.Query(ctx, "SELECT transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee FROM payment WHERE order_uid = $1", ordersToSave[i].OrderUuid)
+		payment, err := pgx.CollectExactlyOneRow(paymentRow, pgx.RowToStructByName[storage.Payment])
+		if err != nil {
+			fmt.Println("payment_rec_err: ", err)
+		}
+		ordersToSave[i].Payment = payment
+		paymentRow.Close()
+	}
+
+	for i := range ordersToSave {
+
+		itemRows, err := conn.Query(ctx, "SELECT chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status FROM items WHERE order_uid = $1", ordersToSave[i].OrderUuid)
+		if err != nil {
+			fmt.Println(err)
+		}
+		var orderItems []storage.Item
+		for itemRows.Next() {
+			var itm storage.Item
+			if err := itemRows.Scan(
+				&itm.ChrtId,
+				&itm.TrackNumber,
+				&itm.Price,
+				&itm.Rid,
+				&itm.Name,
+				&itm.Sale,
+				&itm.Size,
+				&itm.TotalPrice,
+				&itm.NmId,
+				&itm.Brand,
+				&itm.Status,
+			); err != nil {
+				return nil
+			}
+
+			orderItems = append(orderItems, itm)
+		}
+		ordersToSave[i].Items = orderItems
+		itemRows.Close()
+	}
+
+	fmt.Println(len(ordersToSave))
+	fmt.Println(ordersToSave)
 
 	return ordersToSave
 }

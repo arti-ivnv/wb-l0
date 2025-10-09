@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   postgres:
     image: postgres:17.4
@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: wb_db
     ports:
       - "15432:5432"
-      # volumes:
-      # - ./db:/var/lib/postgresql/data # remove for dev
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:

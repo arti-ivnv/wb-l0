@@ -4,29 +4,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f7;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #8a2be2, #6a0dad);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0;
+            min-height: calc(100vh - 160px);
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .tracking-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .tracking-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .tracking-title {
+            color: #333;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .order-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .order-input:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+        }
+
+        .order-input::placeholder {
+            color: #999;
+        }
+
+        .track-button {
+            background: linear-gradient(135deg, #8a2be2, #6a0dad);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .track-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .track-button:active {
+            transform: translateY(0);
+        }
+
+        .help-text {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Order Info Section */
+        .order-info {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+        }
+
+        .order-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-id {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8a2be2;
+        }
+
+        .order-status {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #444;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: #8a2be2;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .items-table th {
+            background-color: #f8f8f8;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 1px solid #eee;
+        }
+
+        .items-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .brand-name {
+            color: #8a2be2;
+            font-weight: 500;
+        }
+
+        .price {
+            font-weight: 600;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .total-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8a2be2;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #8a2be2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .tracking-card,
+            .order-info {
+                padding: 20px;
+                margin: 0 10px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .items-table {
+                font-size: 14px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 8px 10px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+
+    <title>Wildberries - Order Tracking</title>
 </head>
-<header style="place-self: center;">
-    <!-- Header -->
-    <div style="padding-top: 20%;">
-        <p id="header_txt">L0 Assignment </p>
-    </div>
-</header>
 
 <body>
-    <!-- Order search card -->
-    <div>
-        <!-- Search field -->
-        <div>
-
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🛍️</span>
+                    WILDBERRIES
+                </div>
+            </div>
         </div>
-        <!-- Search btn -->
-    </div>
+    </header>
 
-    <!-- Output results -->
-    <div>
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Track Your Order</h1>
 
-    </div>
+            <div class="tracking-section">
+                <div class="tracking-card">
+                    <h2 class="tracking-title">Enter Order UID</h2>
+                    <form id="tracking-form">
+                        <div class="form-group">
+                            <label for="orderUid" class="form-label">Order UID</label>
+                            <input type="text" id="orderUid" class="order-input"
+                                placeholder="Enter your order UID (e.g., b563feb7b2b84b6test)" required>
+                        </div>
+                        <button type="submit" class="track-button">Track Order</button>
+                    </form>
+                    <p class="help-text">
+                        Enter your order UID to track the status of your delivery.
+                        You can find the UID in your order confirmation email or in your account.
+                    </p>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Loading order information...</p>
+                </div>
+
+                <div class="error-message" id="error-message">
+                    Order not found. Please check your Order UID and try again.
+                </div>
+
+                <div class="order-info" id="order-info">
+                    <div class="order-info-header">
+                        <div class="order-id" id="order-id">Order #b563feb7b2b84b6test</div>
+                        <div class="order-status">Delivered</div>
+                    </div>
+
+
+                    <div class="info-section">
+                        <h3 class="section-title">🛒 Order Information</h3>
+                        <div class="info-grid" id="order2-info">
+                            <!-- Order info will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3 class="section-title">📦 Delivery Information</h3>
+                        <div class="info-grid" id="delivery-info">
+                            <!-- Delivery info will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3 class="section-title">💳 Payment Information</h3>
+                        <div class="info-grid" id="payment-info">
+                            <!-- Payment info will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3 class="section-title">🛍️ Order Items</h3>
+                        <table class="items-table" id="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Chrt id</th>
+                                    <th>Track number</th>
+                                    <th>Price</th>
+                                    <th>Rid</th>
+                                    <th>Name</th>
+                                    <th>Sale</th>
+                                    <th>Size</th>
+                                    <th>Total price</th>
+                                    <th>Nm id</th>
+                                    <th>Brand</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-body">
+                                <!-- Items will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+    <script>
+
+        document.getElementById('tracking-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const orderUid = document.getElementById('orderUid').value.trim();
+
+            if (!orderUid) {
+                alert('Please enter an Order UID');
+                return;
+            }
+
+            // Show loading, hide error and previous order info
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('order-info').style.display = 'none';
+
+            try {
+                // Make API request
+                const response = await fetch(`http://localhost:8087/order/${orderUid}`);
+
+                if (!response.ok) {
+                    throw new Error('Order not found');
+                }
+
+                const orderData = await response.json();
+
+                console.log('Order Data:', orderData); // Log the fetched order data
+
+                // Populate the order information
+                populateOrderInfo(orderData);
+
+                // Show order info, hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('order-info').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error fetching order:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        });
+
+
+
+        function populateOrderInfo(order) {
+            // Set order ID
+            document.getElementById('order-id').textContent = `Order #${order.order_uid}`;
+
+            // Populate order information
+            const orderInfo = document.getElementById('order2-info');
+            orderInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Order UID</span>
+                    <span class="info-value">${order.order_uid}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Track number</span>
+                    <span class="info-value">${order.track_number}</span>
+                </div>
+                 <div class="info-item">
+                    <span class="info-label">Entry</span>
+                    <span class="info-value">${order.entry}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Locale</span>
+                    <span class="info-value">${order.locale}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Internal signature</span>
+                    <span class="info-value">${order.internal_signature}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Customer Id</span>
+                    <span class="info-value">${order.customer_id}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Delivery service</span>
+                    <span class="info-value">${order.delivery_service}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Shared key</span>
+                    <span class="info-value">${order.shardkey}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sm id</span>
+                    <span class="info-value">${order.sm_id}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date created</span>
+                    <span class="info-value">${order.date_created}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Oof shared</span>
+                    <span class="info-value">${order.oof_shard}</span>
+                </div>
+            `;
+
+            // Populate delivery information
+            const deliveryInfo = document.getElementById('delivery-info');
+            deliveryInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Recipient</span>
+                    <span class="info-value">${order.delivery.name}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">${order.delivery.phone}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">${order.delivery.email}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Address</span>
+                    <span class="info-value">${order.delivery.address}, ${order.delivery.city}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Region</span>
+                    <span class="info-value">${order.delivery.region}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ZIP Code</span>
+                    <span class="info-value">${order.delivery.zip}</span>
+                </div>
+            `;
+
+            // Populate payment information
+            const paymentInfo = document.getElementById('payment-info');
+            paymentInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Transaction ID</span>
+                    <span class="info-value">${order.payment.transaction}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Amount</span>
+                    <span class="info-value">$${order.payment.amount}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Request id</span>
+                    <span class="info-value">${order.payment.request_id}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Currency</span>
+                    <span class="info-value">${order.payment.currency}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Provider</span>
+                    <span class="info-value">${order.payment.provider}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Amount</span>
+                    <span class="info-value">${order.payment.amount}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Payment dt</span>
+                    <span class="info-value">${order.payment.payment_dt}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Bank</span>
+                    <span class="info-value">${order.payment.bank}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Delivery cost</span>
+                    <span class="info-value">${order.payment.delivery_cost}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Goods total</span>
+                    <span class="info-value">${order.payment.goods_total}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Custom fee</span>
+                    <span class="info-value">${order.payment.custom_fee}</span>
+                </div>
+            `;
+
+            // // Populate items
+            const itemsBody = document.getElementById('items-body');
+            itemsBody.innerHTML = '';
+
+            order.items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.chrt_id}</td>
+                    <td>${item.track_number}</td>
+                    <td class="price">$${item.price}</td>
+                    <td>${item.rid}</td>
+                    <td>${item.name}</td>
+                    <td>${item.sale}</td>
+                    <td>${item.size}</td>
+                    <td class="price">$${item.total_price}</td>
+                    <td>${item.mn_id}</td>
+                    <td class="brand-name">${item.brand}</td>
+                    <td>${item.status}</td>
+                
+                `;
+                itemsBody.appendChild(row);
+            });
+
+
+        }
+    </script>
 
 </body>
 
