@@ -43,6 +43,9 @@ func SetUpNewConsumer(ctx context.Context, storage *postgres.PostgresStorage, sf
 			} else {
 				log.Info("[CONSUMER] Kafka msg was commited")
 			}
+		} else {
+			log.Error("[CONSUMER] Error while parsing kafka message. err: ", err.Error())
+			err = reader.CommitMessages(context.Background(), msg)
 		}
 
 	}

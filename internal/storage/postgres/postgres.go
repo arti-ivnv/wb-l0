@@ -8,6 +8,7 @@ import (
 	"ls-0/arti/order/internal/storage"
 	"sync"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -62,6 +63,21 @@ func (ps *PostgresStorage) AddOrder(inOrder string, ctx context.Context) error {
 	if err != nil {
 		fmt.Println("Error unmarshaling json data: ", err)
 		return fmt.Errorf("error unmarshaling json data: %w", err)
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(orderToSave); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		errors := make(map[string]string)
+
+		for _, fieldError := range validationErrors {
+			errors[fieldError.Field()] = fmt.Sprintf(
+				"Field validation for '%s' failed on the '%s' tag",
+				fieldError.Field(),
+				fieldError.Tag(),
+			)
+		}
+		return fmt.Errorf("error validating json data: %w", err)
 	}
 
 	tx, err := conn.Begin(ctx)
